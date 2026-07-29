@@ -1,6 +1,6 @@
 // PenguinAnalyzer.java
-// D. Singletary
-// 3/14/25
+// Alejandro Cueto
+// 7/29/26
 // Handles file reading, processing, and writing of penguin data
 
 package edu.fscj.cop2800c.penguin;
@@ -12,14 +12,14 @@ import java.io.*;
 public class PenguinAnalyzer {
     static final String FILE_NAME = "PalmerPenguins.csv";
     static final String[] HEADERS = {
-        "SampleNum", "Species", "CulmenLen", 
+        "SampleNum", "Species", "CulmenLen",
         "CulmenDepth", "FlipperLen", "BodyMass", "Sex"
     };
-    static final String FORMAT_STR = 
+    static final String FORMAT_STR =
         "%-12s %-10s %-12s %-12s %-12s %-12s %-8s%n";
-    static final String FORMAT_NUM_STR = 
+    static final String FORMAT_NUM_STR =
         "%-12d %-10s %-12.1f %-12.1f %-12.1f %-12.1f %-8s%n";
-    
+
     private ArrayList<Penguin> penguinList;
 
     // Constructor
@@ -31,7 +31,7 @@ public class PenguinAnalyzer {
     public void addPenguin(Penguin penguin) {
         penguinList.add(penguin);
     }
-    
+
     // Method to retrieve a penguin by sample number
     public Penguin getPenguinBySampleNum(int sampleNum) {
         for (Penguin penguin : penguinList) {
@@ -39,12 +39,11 @@ public class PenguinAnalyzer {
                 return penguin;
             }
         }
-        return null; // Return null if not found
+        return null;
     }
-    
+
     // Method to display penguin details using toString
     public void showRawData() {
-        // use "magic" toString properties to print each penguin
         for (Penguin penguin : penguinList) {
             System.out.println(penguin);
         }
@@ -53,55 +52,80 @@ public class PenguinAnalyzer {
     // Read data from CSV and populate penguinList
     // Returns number of penguins read.
     public int readPenguins() {
-        if (penguinList == null)
+        if (penguinList == null) {
             penguinList = new ArrayList<>();
-    
-        int count = 0; // Track the number of penguins read
-    
-        try (BufferedReader reader = 
-                new BufferedReader(new FileReader(FILE_NAME))) {
+        }
+
+        int count = 0;
+
+        try (BufferedReader reader =
+                 new BufferedReader(new FileReader(FILE_NAME))) {
+
             String line;
             reader.readLine(); // Skip header
-    
+
             while ((line = reader.readLine()) != null) {
+
                 String[] tokens = line.split(",");
-    
-                // Ensure correct column count
+
                 if (tokens.length >= 7) {
+
                     try {
-                        int sampleNumber = 
+                        int sampleNumber =
                             Integer.parseInt(tokens[0].trim());
-                        String species = 
+
+                        String species =
                             tokens[1].trim();
-                        double culmenLength = 
+
+                        double culmenLength =
                             Double.parseDouble(tokens[2].trim());
-                        double culmenDepth = 
+
+                        double culmenDepth =
                             Double.parseDouble(tokens[3].trim());
-                        double flipperLength = 
+
+                        double flipperLength =
                             Double.parseDouble(tokens[4].trim());
-                        double bodyMass = 
+
+                        double bodyMass =
                             Double.parseDouble(tokens[5].trim());
-                        String sex = 
+
+                        String sex =
                             tokens[6].trim();
-    
-                        // Ensure constructor order matches attribute order
-                        Penguin penguin = new Penguin(sampleNumber, species, 
-                                culmenLength, culmenDepth, 
-                                bodyMass, sex, flipperLength);
+
+
+                        Penguin penguin = new Penguin(
+                            sampleNumber,
+                            species,
+                            culmenLength,
+                            culmenDepth,
+                            bodyMass,
+                            sex,
+                            flipperLength
+                        );
+
                         penguinList.add(penguin);
-                        count++; // Increment count after adding a penguin
+                        count++;
+
                     } catch (NumberFormatException e) {
-                        System.err.println("Skipping invalid row: " + line);
+                        System.err.println(
+                            "Skipping invalid row: " + line);
+
+                    } catch (InvalidBirdDataException e) {
+                        System.out.println(e);
                     }
+
                 } else {
-                    System.err.println("Skipping malformed row: " + line);
+                    System.err.println(
+                        "Skipping malformed row: " + line);
                 }
             }
+
         } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+            System.err.println(
+                "Error reading file: " + e.getMessage());
         }
-    
-        return count; // Return the total number of penguins read
+
+        return count;
     }
 
 
@@ -112,31 +136,44 @@ public class PenguinAnalyzer {
         for (Penguin penguin : penguinList) {
             System.out.printf(
                 FORMAT_NUM_STR,
-                penguin.getSampleNum(), penguin.getSpecies(),
-                penguin.getCulmenLength(), penguin.getCulmenDepth(),
-                penguin.getFlipperLength(), penguin.getBodyMass(),
-                penguin.getSex());
+                penguin.getSampleNum(),
+                penguin.getSpecies(),
+                penguin.getCulmenLength(),
+                penguin.getCulmenDepth(),
+                penguin.getFlipperLength(),
+                penguin.getBodyMass(),
+                penguin.getSex()
+            );
         }
     }
 
+
     // Write processed data to an output file
     public void writePenguins() {
-        try (PrintWriter writer = 
+        try (PrintWriter writer =
                 new PrintWriter(new FileWriter("PenguinOutput.txt"))) {
-            writer.printf(FORMAT_STR,(Object[]) HEADERS);
+
+            writer.printf(FORMAT_STR, (Object[]) HEADERS);
 
             for (Penguin penguin : penguinList) {
                 writer.printf(
                     FORMAT_NUM_STR,
-                    penguin.getSampleNum(), penguin.getSpecies(),
-                    penguin.getCulmenLength(), penguin.getCulmenDepth(),
-                    penguin.getFlipperLength(), penguin.getBodyMass(),
-                    penguin.getSex());
+                    penguin.getSampleNum(),
+                    penguin.getSpecies(),
+                    penguin.getCulmenLength(),
+                    penguin.getCulmenDepth(),
+                    penguin.getFlipperLength(),
+                    penguin.getBodyMass(),
+                    penguin.getSex()
+                );
             }
+
             System.out.println(
                 "Penguin data successfully written to PenguinOutput.txt.");
+
         } catch (IOException e) {
-            System.err.println("Error writing to file: " + e.getMessage());
+            System.err.println(
+                "Error writing to file: " + e.getMessage());
         }
     }
 }
